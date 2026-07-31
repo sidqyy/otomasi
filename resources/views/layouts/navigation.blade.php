@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav x-data="{ open: false }" class="bg-white/80 backdrop-blur-lg border-b border-emerald-100/60 sticky top-0 z-50 shadow-sm shadow-emerald-900/5">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -15,8 +15,17 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('chat.index')" :active="request()->routeIs('chat.*')">
+                    <x-nav-link :href="route('chat.index')" :active="request()->routeIs('chat.index')">
                         {{ __('Chat Inbox') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('admin.products.index')" :active="request()->routeIs('admin.products.*')">
+                        {{ __('Products') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('admin.faqs.index')" :active="request()->routeIs('admin.faqs.*')">
+                        {{ __('FAQs') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('admin.auto-replies.index')" :active="request()->routeIs('admin.auto-replies.*')">
+                        {{ __('Auto Replies') }}
                     </x-nav-link>
                 </div>
             </div>

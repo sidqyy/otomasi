@@ -1,27 +1,39 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ChatController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
+if (!\Illuminate\Support\Facades\Auth::check() && !app()->runningInConsole()) {
     $user = \App\Models\User::first();
     if ($user) {
         \Illuminate\Support\Facades\Auth::login($user);
     }
+}
+
+Route::get('/', function () {
     return redirect()->route('dashboard');
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/chat', [\App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
-    Route::get('/chat/{contactId}', [\App\Http\Controllers\ChatController::class, 'show'])->name('chat.show');
-    Route::post('/chat/{contactId}/send', [\App\Http\Controllers\ChatController::class, 'sendMessage'])->name('chat.send');
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+Route::prefix('chat')->name('chat.')->group(function () {
+    Route::get('/', [ChatController::class, 'index'])->name('index');
+    Route::get('/messages/{contactId}', [ChatController::class, 'getMessages'])->name('messages');
+    Route::post('/messages/{contactId}', [ChatController::class, 'sendMessage'])->name('send');
 });
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+Route::prefix('profile')->name('profile.')->group(function () {
+    Route::get('/', [ProfileController::class, 'edit'])->name('edit');
+    Route::patch('/', [ProfileController::class, 'update'])->name('update');
+    Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
+});
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
+    Route::resource('faqs', \App\Http\Controllers\Admin\FaqController::class);
+    Route::resource('auto-replies', \App\Http\Controllers\Admin\AutoReplyController::class);
 });
 
 require __DIR__.'/auth.php';
