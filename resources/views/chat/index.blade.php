@@ -20,8 +20,8 @@
                                 <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-500 font-bold text-lg">
                                     {{ substr($contact->push_name ?? $contact->name ?? 'U', 0, 1) }}
                                 </div>
-                                <div class="ml-4 flex-1">
-                                    <h4 class="text-sm font-bold text-gray-900">{{ $contact->push_name ?? $contact->name ?? $contact->phone_number }}</h4>
+                                <div class="ml-4 flex-1 min-w-0">
+                                    <h4 class="text-sm font-bold text-gray-900 truncate">{{ $contact->push_name ?? $contact->name ?? $contact->phone_number }}</h4>
                                     <p class="text-xs text-gray-500 truncate">
                                         {{ $contact->messages->first()->content ?? 'Mulai percakapan' }}
                                     </p>
@@ -101,13 +101,16 @@
                 newMessage: '',
                 
                 loadMessages(contactId) {
-                    fetch(`/chat/${contactId}`)
-                        .then(res => res.json())
+                    fetch(`/chat/messages/${contactId}`)
+                        .then(res => {
+                            if(!res.ok) throw new Error("Gagal mengambil data");
+                            return res.json();
+                        })
                         .then(data => {
                             this.activeContact = data.contact;
                             this.messages = data.messages;
                             this.scrollToBottom();
-                        });
+                        }).catch(e => console.error(e));
                 },
 
                 sendMessage() {
@@ -125,7 +128,7 @@
                     });
                     this.scrollToBottom();
 
-                    fetch(`/chat/${this.activeContact.id}/send`, {
+                    fetch(`/chat/messages/${this.activeContact.id}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
