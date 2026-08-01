@@ -42,8 +42,8 @@ Route::prefix('profile')->name('profile.')->group(function () {
 
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
-    Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('admin.settings');
-    Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('admin.settings.update');
+    Route::get('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings');
+    Route::post('/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
 
     Route::resource('faqs', \App\Http\Controllers\Admin\FaqController::class);
     Route::resource('auto-replies', \App\Http\Controllers\Admin\AutoReplyController::class);
