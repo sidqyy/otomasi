@@ -20,7 +20,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 
 Route::prefix('chat')->name('chat.')->group(function () {
     Route::get('/', [ChatController::class, 'index'])->name('index');
-    Route::get('/messages/{contactId}', [ChatController::class, 'getMessages'])->name('messages');
+    Route::get('/messages/{contactId}', [ChatController::class, 'show'])->name('messages');
     Route::post('/messages/{contactId}', [ChatController::class, 'sendMessage'])->name('send');
 });
 
