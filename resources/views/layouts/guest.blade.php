@@ -60,9 +60,14 @@
 
             .premium-input {
                 background: #f8fafc !important;
-                border: 2px solid transparent !important;
+                border: 1px solid #cbd5e1 !important;
+                border-radius: 0.5rem !important;
+                padding: 0.75rem 1rem !important;
+                margin-top: 0.5rem !important;
                 transition: all 0.3s ease !important;
                 box-shadow: inset 0 2px 4px rgba(0,0,0,0.02) !important;
+                width: 100% !important;
+                color: #1e293b !important;
             }
             .premium-input:focus {
                 background: #ffffff !important;
