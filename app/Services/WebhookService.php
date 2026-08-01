@@ -129,7 +129,11 @@ class WebhookService
                         return "Tanya: {$f->question} | Jawab: {$f->answer}";
                     })->implode("; ");
 
-                    $systemPrompt = "Anda adalah asisten pelanggan toko bunga 'Otomasi Florist'. Jawab dengan ramah, singkat, dan gunakan bahasa Indonesia yang santai tapi profesional. Jangan gunakan format Markdown berlebihan (* atau ** diperbolehkan). "
+                    // Ambil instruksi kustom dari pengaturan
+                    $customPromptSetting = \App\Models\Setting::where('key', 'ai_system_prompt')->first();
+                    $customPrompt = $customPromptSetting && !empty(trim($customPromptSetting->value)) ? trim($customPromptSetting->value) : "Anda adalah asisten pelanggan toko bunga 'Otomasi Florist'. Jawab dengan ramah, singkat, dan gunakan bahasa Indonesia yang santai tapi profesional. Jangan gunakan format Markdown berlebihan (* atau ** diperbolehkan).";
+
+                    $systemPrompt = $customPrompt . " "
                                   . "Daftar produk kami: {$allProducts}. "
                                   . "Informasi umum (FAQ): {$allFaqs}. "
                                   . "Jika ditanya hal di luar toko bunga atau produk yang tidak ada, minta maaf dengan sopan.";

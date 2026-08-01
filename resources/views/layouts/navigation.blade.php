@@ -25,7 +25,10 @@
                         {{ __('FAQs') }}
                     </x-nav-link>
                     <x-nav-link :href="route('admin.auto-replies.index')" :active="request()->routeIs('admin.auto-replies.*')">
-                        {{ __('Auto Replies') }}
+                        {{ __('Balasan Otomatis') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('admin.settings')" :active="request()->routeIs('admin.settings')">
+                        {{ __('Pengaturan AI') }}
                     </x-nav-link>
                 </div>
             </div>
