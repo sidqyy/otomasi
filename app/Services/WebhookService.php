@@ -116,36 +116,10 @@ class WebhookService
                     }
                 }
 
-                // 5. Integrasi Google Gemini AI (Jika semua logika di atas tidak ada yang cocok)
+                // 5. Integrasi Google Gemini AI DIMATIKAN
+                // Sengaja dibiarkan kosong agar Fonnte AI bawaan bisa mengambil alih
                 if (!$replyText) {
-                    $gemini = app(\App\Services\GeminiService::class);
-                    
-                    // Bangun konteks untuk AI
-                    $allProducts = \App\Models\Product::where('is_ready', true)->get()->map(function($p) {
-                        return $p->name . " (Rp " . number_format($p->price, 0, ',', '.') . ")";
-                    })->implode(", ");
-                    
-                    $allFaqs = \App\Models\Faq::where('is_active', true)->get()->map(function($f) {
-                        return "Tanya: {$f->question} | Jawab: {$f->answer}";
-                    })->implode("; ");
-
-                    // Ambil instruksi kustom dari pengaturan
-                    $customPromptSetting = \App\Models\Setting::where('key', 'ai_system_prompt')->first();
-                    $customPrompt = $customPromptSetting && !empty(trim($customPromptSetting->value)) ? trim($customPromptSetting->value) : "Anda adalah asisten pelanggan toko bunga 'Otomasi Florist'. Jawab dengan ramah, singkat, dan gunakan bahasa Indonesia yang santai tapi profesional. Jangan gunakan format Markdown berlebihan (* atau ** diperbolehkan).";
-
-                    $systemPrompt = $customPrompt . " "
-                                  . "Daftar produk kami: {$allProducts}. "
-                                  . "Informasi umum (FAQ): {$allFaqs}. "
-                                  . "Jika ditanya hal di luar toko bunga atau produk yang tidak ada, minta maaf dengan sopan.";
-
-                    $aiReply = $gemini->generateReply($payload['message'], $systemPrompt);
-                    
-                    if ($aiReply) {
-                        $replyText = $aiReply;
-                    } else {
-                        // Fallback terakhir jika API Key belum diset atau error
-                        $replyText = "Mohon maaf, saat ini customer service kami sedang offline atau belum mengenali pertanyaan Anda. Silakan hubungi nomor admin langsung.";
-                    }
+                    return; 
                 }
 
                 // Jika ada balasan otomatis, kirim via Fonnte
