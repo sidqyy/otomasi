@@ -27,6 +27,13 @@ class WebhookService
                 return;
             }
 
+            // 1b. Anti-Loop Ekstrem: Fonnte (versi gratis) memantulkan pesan keluar kita sebagai pesan masuk
+            // dan selalu menambahkan tulisan "_Sent via fonnte.com_". Kita harus abaikan pesan pantulan ini!
+            if ($messageTextRaw && str_contains(strtolower($messageTextRaw), 'sent via fonnte')) {
+                Log::info("Fonnte outbound echo blocked: {$messageTextRaw}");
+                return;
+            }
+
             // 2. Anti-Spam: Cek apakah pesan yang sama dari orang yang sama masuk dalam 15 detik terakhir
             if ($sender && $messageTextRaw) {
                 $isDuplicate = WebhookLog::where('payload->sender', $sender)
