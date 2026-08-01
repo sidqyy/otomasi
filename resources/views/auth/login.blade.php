@@ -13,14 +13,14 @@
         <!-- Username -->
         <div>
             <label for="name" class="block font-medium text-sm text-gray-700">Username</label>
-            <input id="name" class="block mt-1 w-full border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 rounded-lg shadow-sm" type="text" name="name" :value="old('name')" required autofocus autocomplete="username" placeholder="Enter your username" />
+            <input id="name" class="block mt-1 w-full rounded-lg premium-input px-4 py-3" type="text" name="name" :value="old('name')" required autofocus autocomplete="username" placeholder="Enter your username" />
             <x-input-error :messages="$errors->get('name')" class="mt-2" />
         </div>
 
         <!-- Password -->
         <div class="mt-5">
             <label for="password" class="block font-medium text-sm text-gray-700">Password</label>
-            <input id="password" class="block mt-1 w-full border-gray-300 focus:border-emerald-500 focus:ring-emerald-500 rounded-lg shadow-sm" type="password" name="password" required autocomplete="current-password" placeholder="••••••••" />
+            <input id="password" class="block mt-1 w-full rounded-lg premium-input px-4 py-3" type="password" name="password" required autocomplete="current-password" placeholder="••••••••" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
@@ -33,7 +33,7 @@
         </div>
 
         <div class="mt-8">
-            <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-3 bg-emerald-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-emerald-700 focus:bg-emerald-700 active:bg-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-md shadow-emerald-500/30">
+            <button type="submit" class="w-full inline-flex justify-center items-center px-4 py-3 premium-btn rounded-lg font-semibold text-sm text-white uppercase tracking-widest">
                 Sign In to Dashboard
             </button>
         </div>
