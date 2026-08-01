@@ -43,19 +43,18 @@
             }
 
             .glass-card {
-                background: rgba(255, 255, 255, 0.98);
-                backdrop-filter: blur(20px);
-                -webkit-backdrop-filter: blur(20px);
-                border: 1px solid rgba(255, 255, 255, 0.5);
-                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255,255,255,0.1) inset;
-                border-radius: 1.5rem;
+                background: rgba(255, 255, 255, 0.98) !important;
+                border: 1px solid rgba(255, 255, 255, 0.5) !important;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+                border-radius: 1.5rem !important;
+                padding: 2.5rem 2rem !important; /* Force padding */
                 transform: translateY(0);
                 transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             }
             
             .glass-card:hover {
                 transform: translateY(-5px);
-                box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.2) inset;
+                box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6) !important;
             }
 
             .premium-input {
@@ -67,6 +66,7 @@
                 transition: all 0.3s ease !important;
                 box-shadow: inset 0 2px 4px rgba(0,0,0,0.02) !important;
                 width: 100% !important;
+                box-sizing: border-box !important;
                 color: #1e293b !important;
             }
             .premium-input:focus {
