@@ -5,12 +5,12 @@
         </h2>
     </x-slot>
 
-    <div class="py-6 h-[calc(100vh-100px)]" x-data="chatApp()">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 h-full">
+    <div class="py-4 h-[75vh] min-h-[500px]" x-data="chatApp()">
+        <div class="max-w-7xl mx-auto h-full">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg flex h-full border border-gray-200">
                 
                 <!-- Sidebar Kontak -->
-                <div class="w-1/3 border-r border-gray-200 flex flex-col bg-gray-50">
+                <div class="w-1/3 md:w-1/4 border-r border-gray-200 flex flex-col bg-gray-50 min-w-[250px]">
                     <div class="p-4 border-b border-gray-200 bg-white">
                         <input type="text" placeholder="Cari percakapan..." class="w-full border-gray-300 rounded-lg shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                     </div>
