@@ -56,7 +56,9 @@ class ProductController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $product = \App\Models\Product::findOrFail($id);
+        $categories = \App\Models\ProductCategory::all();
+        return view('admin.products.edit', compact('product', 'categories'));
     }
 
     /**
@@ -64,7 +66,26 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $product = \App\Models\Product::findOrFail($id);
+        
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'product_category_id' => 'required|exists:product_categories,id',
+            'price' => 'required|numeric|min:0',
+            'description' => 'nullable|string',
+            'is_ready' => 'boolean'
+        ]);
+        
+        // Update slug only if name changed
+        if ($product->name !== $validated['name']) {
+            $validated['slug'] = \Illuminate\Support\Str::slug($validated['name'] . '-' . time());
+        }
+        
+        $validated['is_ready'] = $request->has('is_ready');
+        
+        $product->update($validated);
+        
+        return redirect()->route('admin.products.index')->with('success', 'Product updated successfully.');
     }
 
     /**
@@ -72,6 +93,9 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $product = \App\Models\Product::findOrFail($id);
+        $product->delete();
+        
+        return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully.');
     }
 }

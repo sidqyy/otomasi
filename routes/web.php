@@ -5,15 +5,25 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ChatController;
 use Illuminate\Support\Facades\Route;
 
-if (!\Illuminate\Support\Facades\Auth::check() && !app()->runningInConsole()) {
-    $user = \App\Models\User::first();
-    if ($user) {
-        \Illuminate\Support\Facades\Auth::login($user);
-    }
-}
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
+});
+
+Route::get('/setup-admin', function () {
+    $user = \App\Models\User::firstOrCreate(
+        ['name' => 'admin'],
+        [
+            'email' => 'admin@otomasi.com',
+            'password' => \Illuminate\Support\Facades\Hash::make('admin123')
+        ]
+    );
+    
+    $user->update([
+        'password' => \Illuminate\Support\Facades\Hash::make('admin123')
+    ]);
+    
+    return redirect()->route('login')->with('status', 'Akun admin berhasil dibuat/direset! Silakan login.');
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
