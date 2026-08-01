@@ -18,6 +18,21 @@ class WebhookService
     public function handleFonnteWebhook($payload)
     {
         try {
+            $messageId = $payload['id'] ?? null;
+            
+            // 1. Anti-Spam: Cek apakah ID pesan ini sudah pernah diproses sebelumnya
+            if ($messageId && WebhookLog::where('payload->id', $messageId)->exists()) {
+                Log::info("Duplicate webhook received for ID: {$messageId}");
+                return; // Stop, sudah pernah diproses!
+            }
+
+            // 2. Anti-Loop: Cek apakah pesan ini dikirim oleh bot itu sendiri
+            $device = $payload['device'] ?? null;
+            $sender = $payload['sender'] ?? null;
+            if ($device && $sender && $device == $sender) {
+                return; // Jangan balas pesan sendiri!
+            }
+
             // Simpan log raw data
             WebhookLog::create([
                 'payload' => $payload,
