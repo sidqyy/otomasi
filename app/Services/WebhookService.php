@@ -18,19 +18,26 @@ class WebhookService
     public function handleFonnteWebhook($payload)
     {
         try {
-            $messageId = $payload['id'] ?? null;
-            
-            // 1. Anti-Spam: Cek apakah ID pesan ini sudah pernah diproses sebelumnya
-            if ($messageId && WebhookLog::where('payload->id', $messageId)->exists()) {
-                Log::info("Duplicate webhook received for ID: {$messageId}");
-                return; // Stop, sudah pernah diproses!
-            }
-
-            // 2. Anti-Loop: Cek apakah pesan ini dikirim oleh bot itu sendiri
             $device = $payload['device'] ?? null;
             $sender = $payload['sender'] ?? null;
+            $messageTextRaw = $payload['message'] ?? null;
+
+            // 1. Anti-Loop: Jangan balas pesan yang dikirim oleh bot itu sendiri
             if ($device && $sender && $device == $sender) {
-                return; // Jangan balas pesan sendiri!
+                return;
+            }
+
+            // 2. Anti-Spam: Cek apakah pesan yang sama dari orang yang sama masuk dalam 15 detik terakhir
+            if ($sender && $messageTextRaw) {
+                $isDuplicate = WebhookLog::where('payload->sender', $sender)
+                                ->where('payload->message', $messageTextRaw)
+                                ->where('created_at', '>=', now()->subSeconds(15))
+                                ->exists();
+                
+                if ($isDuplicate) {
+                    Log::info("Spam/Duplicate webhook blocked from: {$sender}");
+                    return; // Stop, ini pesan duplikat karena Fonnte retry!
+                }
             }
 
             // Simpan log raw data
