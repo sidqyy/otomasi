@@ -69,74 +69,12 @@ class WebhookService
                 // Simpan pesan masuk
                 $this->messageRepo->storeInboundMessage($contact->id, $payload['message']);
 
-                // === LOGIKA CHATBOT ===
-                $replyText = null;
-
-                // 1. Cek Auto Reply (Exact Match)
-                $autoReply = \App\Models\AutoReply::where('keyword', $messageText)
-                                ->where('match_type', 'exact')
-                                ->where('is_active', true)->first();
-
-                // 2. Cek Auto Reply (Contains Match)
-                if (!$autoReply) {
-                    $autoReply = \App\Models\AutoReply::where('match_type', 'contains')
-                                    ->where('is_active', true)
-                                    ->get()
-                                    ->first(function($reply) use ($messageText) {
-                                        return str_contains($messageText, strtolower($reply->keyword));
-                                    });
-                }
-
-                if ($autoReply) {
-                    $replyText = $autoReply->reply_text;
-                }
-
-                // 3. Cek FAQ
-                if (!$replyText) {
-                    $faq = \App\Models\Faq::where('is_active', true)
-                            ->get()
-                            ->first(function($f) use ($messageText) {
-                                // Pencarian sederhana, apakah kata-kata di pertanyaan ada di pesan
-                                return str_contains($messageText, strtolower($f->question));
-                            });
-                    if ($faq) {
-                        $replyText = $faq->answer;
-                    }
-                }
-
-                // 4. Katalog Produk Sederhana (Fallback Tradisional)
-                if (!$replyText && (str_contains($messageText, 'produk') || str_contains($messageText, 'harga') || str_contains($messageText, 'katalog'))) {
-                    $products = \App\Models\Product::where('is_ready', true)->take(5)->get();
-                    if ($products->count() > 0) {
-                        $replyText = "Berikut adalah beberapa produk unggulan kami:\n\n";
-                        foreach($products as $prod) {
-                            $replyText .= "- *{$prod->name}* : Rp" . number_format($prod->price, 0, ',', '.') . "\n";
-                        }
-                        $replyText .= "\nKetik nama produk untuk info lebih detail.";
-                    }
-                }
-
-                // 5. Integrasi Google Gemini AI DIMATIKAN
-                // Sengaja dibiarkan kosong agar Fonnte AI bawaan bisa mengambil alih
-                if (!$replyText) {
-                    return; 
-                }
-
-                // Jika ada balasan otomatis, kirim via Fonnte
-                if ($replyText) {
-                    // Simpan pesan keluar
-                    $outboundMessage = $this->messageRepo->storeOutboundMessage($contact->id, $replyText, 'text', 'bot');
-                    
-                    // Panggil FonnteService
-                    $fonnteService = app(\App\Services\FonnteService::class);
-                    $response = $fonnteService->sendText($sender, $replyText);
-
-                    if (isset($response['status']) && $response['status']) {
-                        $outboundMessage->update(['status' => 'sent', 'message_id' => $response['id'] ?? null]);
-                    } else {
-                        $outboundMessage->update(['status' => 'failed']);
-                    }
-                }
+                // === LOGIKA CHATBOT DIMATIKAN ===
+                // Webhook ini murni hanya berfungsi sebagai "logger" (penampung data masuk).
+                // Semua balasan (Auto-Reply, FAQ, AI) sepenuhnya diurus oleh dasbor Fonnte.
+                
+                // Tidak ada balasan yang dikirim dari web ini.
+                // return null / 200 OK secara otomatis.
 
             }
 
