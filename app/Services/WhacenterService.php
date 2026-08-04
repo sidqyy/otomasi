@@ -27,17 +27,32 @@ class WhacenterService
         }
 
         $data['device_id'] = $this->deviceId;
+        $url = $this->baseUrl . $endpoint;
 
         try {
-            $response = Http::asForm()->post($this->baseUrl . $endpoint, $data);
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data); // Mengirim sebagai multipart/form-data persis seperti dokumentasi
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Mencegah error SSL
+            $result = curl_exec($ch);
             
-            if (!$response->successful() || (isset($response['status']) && $response['status'] === false)) {
-                Log::error('Whacenter API Failed: ' . $response->body());
+            if (curl_errno($ch)) {
+                $error_msg = curl_error($ch);
+                Log::error('Whacenter cURL Error: ' . $error_msg);
+                curl_close($ch);
+                return ['status' => false, 'reason' => $error_msg];
+            }
+            curl_close($ch);
+            
+            $responseArray = json_decode($result, true);
+            
+            if (!$responseArray || (isset($responseArray['status']) && $responseArray['status'] === false)) {
+                Log::error('Whacenter API Failed: ' . $result);
             } else {
-                Log::info('Whacenter API Success: ' . $response->body());
+                Log::info('Whacenter API Success: ' . $result);
             }
             
-            return $response->json();
+            return $responseArray;
         } catch (\Exception $e) {
             Log::error('WhacenterService Error: ' . $e->getMessage());
             return ['status' => false, 'reason' => $e->getMessage()];
