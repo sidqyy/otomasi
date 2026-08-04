@@ -15,6 +15,14 @@ Route::get('/clear', function () {
     return 'Cache cleared successfully!';
 });
 
+Route::get('/logs', function () {
+    $logPath = storage_path('logs/laravel.log');
+    if (file_exists($logPath)) {
+        return response('<pre>' . file_get_contents($logPath) . '</pre>');
+    }
+    return 'No logs found.';
+});
+
 Route::get('/setup-admin', function () {
     $user = \App\Models\User::firstOrCreate(
         ['name' => 'admin'],
