@@ -22,10 +22,15 @@ class WhacenterService
             return ['status' => false, 'reason' => 'device_id is empty'];
         }
 
-        $data['device_id'] = $this->deviceId;
-
         try {
-            $response = Http::post($this->baseUrl . $endpoint, $data);
+            $response = Http::asForm()->post($this->baseUrl . $endpoint . '?device_id=' . $this->deviceId, $data);
+            
+            if (!$response->successful()) {
+                Log::error('Whacenter API Failed: ' . $response->body());
+            } else {
+                Log::info('Whacenter API Success: ' . $response->body());
+            }
+            
             return $response->json();
         } catch (\Exception $e) {
             Log::error('WhacenterService Error: ' . $e->getMessage());
