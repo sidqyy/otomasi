@@ -5,9 +5,9 @@
         </h2>
     </x-slot>
 
-    <div class="py-4 h-[calc(100vh-8rem)] min-h-[500px]" x-data="chatApp()">
-        <div class="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg flex h-full border border-gray-200">
+    <div class="py-4" x-data="chatApp()">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg flex border border-gray-200" style="height: calc(100vh - 160px);">
                 
                 <!-- Sidebar Kontak -->
                 <div class="w-1/3 md:w-1/4 border-r border-gray-200 flex flex-col bg-gray-50 min-w-[250px]">
