@@ -138,6 +138,30 @@ class WebhookService
                     $whacenterService->sendText($sender, $autoReply->reply_text);
                     
                     $this->messageRepo->storeOutboundMessage($contact->id, $autoReply->reply_text);
+                } else {
+                    $faq = \App\Models\Faq::where('is_active', true)
+                        ->where(function($q) use ($messageText) {
+                            $q->where('question', 'LIKE', '%' . $messageText . '%')
+                              ->orWhereRaw('? LIKE CONCAT("%", LOWER(question), "%")', [$messageText]);
+                        })->first();
+                    
+                    if ($faq) {
+                        $whacenterService = app(\App\Services\WhacenterService::class);
+                        $whacenterService->sendText($sender, $faq->answer);
+                        $this->messageRepo->storeOutboundMessage($contact->id, $faq->answer);
+                    } else {
+                        $gemini = app(\App\Services\GeminiService::class);
+                        $systemContextSetting = \App\Models\Setting::where('key', 'gemini_prompt')->first();
+                        $systemContext = $systemContextSetting ? $systemContextSetting->value : 'You are a helpful customer service assistant. Answer concisely and politely.';
+                        
+                        $aiReply = $gemini->generateReply($messageTextRaw, $systemContext);
+                        
+                        if ($aiReply) {
+                            $whacenterService = app(\App\Services\WhacenterService::class);
+                            $whacenterService->sendText($sender, $aiReply);
+                            $this->messageRepo->storeOutboundMessage($contact->id, $aiReply);
+                        }
+                    }
                 }
             }
 
