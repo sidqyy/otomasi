@@ -12,7 +12,7 @@ class WhacenterService
 
     public function __construct()
     {
-        $this->deviceId = config('services.whacenter.device_id');
+        $this->deviceId = trim(config('services.whacenter.device_id'));
     }
 
     protected function sendRequest($endpoint, $data = [])
@@ -22,10 +22,12 @@ class WhacenterService
             return ['status' => false, 'reason' => 'device_id is empty'];
         }
 
+        $data['device_id'] = $this->deviceId;
+
         try {
-            $response = Http::asForm()->post($this->baseUrl . $endpoint . '?device_id=' . $this->deviceId, $data);
+            $response = Http::post($this->baseUrl . $endpoint, $data);
             
-            if (!$response->successful()) {
+            if (!$response->successful() || (isset($response['status']) && $response['status'] === false)) {
                 Log::error('Whacenter API Failed: ' . $response->body());
             } else {
                 Log::info('Whacenter API Success: ' . $response->body());
