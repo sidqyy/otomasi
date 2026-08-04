@@ -5,8 +5,8 @@
         </h2>
     </x-slot>
 
-    <div class="py-4 h-[75vh] min-h-[500px]" x-data="chatApp()">
-        <div class="max-w-7xl mx-auto h-full">
+    <div class="py-4 h-[calc(100vh-8rem)] min-h-[500px]" x-data="chatApp()">
+        <div class="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg flex h-full border border-gray-200">
                 
                 <!-- Sidebar Kontak -->
@@ -44,7 +44,7 @@
                     </template>
                     
                     <template x-if="activeContact">
-                        <div class="flex flex-col h-full">
+                        <div class="flex flex-col h-full min-h-0 overflow-hidden">
                             <!-- Header Chat -->
                             <div class="p-4 bg-white border-b border-gray-200 flex items-center shadow-sm z-10">
                                 <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-500 font-bold">
