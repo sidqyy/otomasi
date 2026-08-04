@@ -117,6 +117,13 @@ class WebhookService
             if ($sender && $messageTextRaw) {
                 $messageText = strtolower(trim($messageTextRaw));
 
+                // TES HARDCODE: Membuktikan bahwa masalahnya ada di API Key Whacenter, bukan di database
+                if ($messageText === 'tes hardcode') {
+                    $whacenterService = app(\App\Services\WhacenterService::class);
+                    $whacenterService->sendText($sender, 'Ini balasan hardcode dari dalam kode web!');
+                    return; // Berhenti di sini, tidak perlu cek database
+                }
+
                 $contact = $this->messageRepo->findOrCreateContact($sender, null, null);
                 
                 $this->messageRepo->storeInboundMessage($contact->id, $messageTextRaw);
