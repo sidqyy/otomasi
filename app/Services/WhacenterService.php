@@ -8,11 +8,15 @@ use Illuminate\Support\Facades\Log;
 class WhacenterService
 {
     protected $deviceId;
-    protected $baseUrl = 'https://app.whacenter.com/api';
+    protected $baseUrl;
 
     public function __construct()
     {
         $this->deviceId = trim(config('services.whacenter.device_id'));
+        $this->baseUrl = trim(config('services.whacenter.base_url', 'https://app.whacenter.com/api'));
+        
+        // Pastikan tidak ada slash berlebih di akhir URL
+        $this->baseUrl = rtrim($this->baseUrl, '/');
     }
 
     protected function sendRequest($endpoint, $data = [])

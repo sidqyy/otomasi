@@ -41,6 +41,7 @@ return [
 
     'whacenter' => [
         'device_id' => env('WHACENTER_DEVICE_ID'),
+        'base_url' => env('WHACENTER_BASE_URL', 'https://app.whacenter.com/api'),
     ],
 
 ];
