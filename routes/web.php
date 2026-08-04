@@ -10,6 +10,11 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::get('/clear', function () {
+    \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+    return 'Cache cleared successfully!';
+});
+
 Route::get('/setup-admin', function () {
     $user = \App\Models\User::firstOrCreate(
         ['name' => 'admin'],
