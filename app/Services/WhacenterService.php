@@ -42,8 +42,11 @@ class WhacenterService
 
     public function sendText($number, $message)
     {
+        // Pastikan hanya angka (menghapus @c.us, +, atau spasi jika ada dari webhook)
+        $cleanNumber = preg_replace('/[^0-9]/', '', $number);
+
         return $this->sendRequest('/send', [
-            'number' => $number,
+            'number' => $cleanNumber,
             'message' => $message,
         ]);
     }
