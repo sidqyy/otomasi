@@ -29,7 +29,7 @@ class WhacenterService
         $data['device_id'] = $this->deviceId;
 
         try {
-            $response = Http::post($this->baseUrl . $endpoint, $data);
+            $response = Http::asForm()->post($this->baseUrl . $endpoint, $data);
             
             if (!$response->successful() || (isset($response['status']) && $response['status'] === false)) {
                 Log::error('Whacenter API Failed: ' . $response->body());
