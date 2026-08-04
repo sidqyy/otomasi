@@ -8,3 +8,4 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::post('/webhook/fonnte', [\App\Http\Controllers\WebhookController::class, 'fonnte']);
+Route::post('/webhook/whacenter', [\App\Http\Controllers\WebhookController::class, 'whacenter']);

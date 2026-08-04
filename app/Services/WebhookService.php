@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Repositories\MessageRepository;
 use App\Models\WebhookLog;
+use App\Models\AutoReply;
 use Illuminate\Support\Facades\Log;
 
 class WebhookService
@@ -80,6 +81,68 @@ class WebhookService
 
         } catch (\Exception $e) {
             Log::error('Webhook Handling Error: ' . $e->getMessage());
+        }
+    }
+
+    public function handleWhacenterWebhook($payload)
+    {
+        try {
+            $device = $payload['device_id'] ?? null;
+            $sender = $payload['sender'] ?? $payload['from'] ?? null;
+            $messageTextRaw = $payload['message'] ?? null;
+
+            if ($device && $sender && $device == $sender) {
+                return;
+            }
+
+            if ($sender && $messageTextRaw) {
+                $isDuplicate = WebhookLog::where('payload->sender', $sender)
+                                ->orWhere('payload->from', $sender)
+                                ->where('payload->message', $messageTextRaw)
+                                ->where('created_at', '>=', now()->subSeconds(15))
+                                ->exists();
+                
+                if ($isDuplicate) {
+                    Log::info("Spam/Duplicate Whacenter webhook blocked from: {$sender}");
+                    return; 
+                }
+            }
+
+            WebhookLog::create([
+                'payload' => $payload,
+                'event' => 'whacenter_incoming',
+                'status' => 'processed'
+            ]);
+
+            if ($sender && $messageTextRaw) {
+                $messageText = strtolower(trim($messageTextRaw));
+
+                $contact = $this->messageRepo->findOrCreateContact($sender, null, null);
+                
+                $this->messageRepo->storeInboundMessage($contact->id, $messageTextRaw);
+
+                $autoReply = AutoReply::where('is_active', true)
+                    ->where(function($query) use ($messageText) {
+                        $query->where(function($q) use ($messageText) {
+                            $q->where('match_type', 'exact')
+                              ->where('keyword', $messageText);
+                        })->orWhere(function($q) use ($messageText) {
+                            $q->where('match_type', 'contains')
+                              ->whereRaw('? LIKE CONCAT("%", keyword, "%")', [$messageText]);
+                        });
+                    })
+                    ->first();
+
+                if ($autoReply) {
+                    $whacenterService = app(\App\Services\WhacenterService::class);
+                    $whacenterService->sendText($sender, $autoReply->reply_text);
+                    
+                    $this->messageRepo->storeOutboundMessage($contact->id, $autoReply->reply_text);
+                }
+            }
+
+        } catch (\Exception $e) {
+            Log::error('Whacenter Webhook Handling Error: ' . $e->getMessage());
         }
     }
 }

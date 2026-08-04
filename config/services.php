@@ -39,4 +39,8 @@ return [
         'api_key' => env('GEMINI_API_KEY'),
     ],
 
+    'whacenter' => [
+        'device_id' => env('WHACENTER_DEVICE_ID'),
+    ],
+
 ];

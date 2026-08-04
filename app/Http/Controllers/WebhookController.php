@@ -35,4 +35,24 @@ class WebhookController extends Controller
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
         }
     }
+
+    public function whacenter(Request $request)
+    {
+        try {
+            $payload = $request->all();
+            
+            if (function_exists('fastcgi_finish_request')) {
+                dispatch(function () use ($payload) {
+                    app(\App\Services\WebhookService::class)->handleWhacenterWebhook($payload);
+                })->afterResponse();
+            } else {
+                $this->webhookService->handleWhacenterWebhook($payload);
+            }
+
+            return response()->json(['status' => 'success', 'message' => 'Whacenter webhook received']);
+        } catch (\Exception $e) {
+            Log::error('Whacenter Webhook Error: ' . $e->getMessage());
+            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
+        }
+    }
 }
