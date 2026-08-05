@@ -8,49 +8,51 @@ use Illuminate\Support\Facades\Log;
 class GeminiService
 {
     protected $apiKey;
-    protected $baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+    protected $baseUrl = 'https://api.groq.com/openai/v1/chat/completions';
 
     public function __construct()
     {
+        // Tetap menggunakan variable gemini_api_key agar tidak perlu repot mengubah .env dan DB
         $this->apiKey = config('services.gemini.api_key');
     }
 
     public function generateReply($userMessage, $systemContext = '')
     {
         if (empty($this->apiKey)) {
-            Log::warning('Gemini API Key is not set.');
+            Log::warning('Groq API Key is not set.');
             return null;
         }
 
         try {
-            // Gabungkan konteks sistem ke dalam pesan pengguna untuk gemini-pro
-            $fullPrompt = "INSTRUCTION: " . $systemContext . "\n\n---\n\nUSER MESSAGE: " . $userMessage;
-
-            $response = Http::post($this->baseUrl . '?key=' . $this->apiKey, [
-                'contents' => [
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Content-Type' => 'application/json',
+            ])->post($this->baseUrl, [
+                'model' => 'llama-3.3-70b-versatile',
+                'messages' => [
+                    [
+                        'role' => 'system',
+                        'content' => $systemContext
+                    ],
                     [
                         'role' => 'user',
-                        'parts' => [
-                            ['text' => $fullPrompt]
-                        ]
+                        'content' => $userMessage
                     ]
                 ],
-                'generationConfig' => [
-                    'temperature' => 0.7,
-                    'maxOutputTokens' => 500,
-                ]
+                'temperature' => 0.7,
+                'max_tokens' => 500,
             ]);
 
             if ($response->successful()) {
                 $data = $response->json();
-                if (isset($data['candidates'][0]['content']['parts'][0]['text'])) {
-                    return trim($data['candidates'][0]['content']['parts'][0]['text']);
+                if (isset($data['choices'][0]['message']['content'])) {
+                    return trim($data['choices'][0]['message']['content']);
                 }
             } else {
-                Log::error('Gemini API Error: ' . $response->body());
+                Log::error('Groq API Error: ' . $response->body());
             }
         } catch (\Exception $e) {
-            Log::error('Gemini Service Exception: ' . $e->getMessage());
+            Log::error('Groq Service Exception: ' . $e->getMessage());
         }
 
         return null;
